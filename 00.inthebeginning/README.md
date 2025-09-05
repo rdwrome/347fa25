@@ -11,7 +11,6 @@
 ## Listening List
 
 ## Install [SuperCollider](https://supercollider.github.io/)
-  - 343/tidal cycles fyi
 
 ## Digital Audio 101 (MTEC-111 refresher?)
 - transducers
