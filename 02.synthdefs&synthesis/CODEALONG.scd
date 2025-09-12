@@ -1,4 +1,8 @@
 // adapted from https://github.com/schollz/workshops
+// eli
+// gentle
+// tutorials from sc documentation
+//
 
 /*SynthDefs
 - a class which pre-compiles multiple unit generators together on the server
