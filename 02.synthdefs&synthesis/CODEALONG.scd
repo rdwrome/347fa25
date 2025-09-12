@@ -109,6 +109,57 @@ x.free;
 // - try changing the number of oscillators (instead of 3, do 1, 2, ..)
 
 
+// Additive synthesis and a look at "mul" and "add" in SinOsc
+
+(
+{
+    var a, b;
+    a = [SinOsc.ar(440, 0, 0.2), Saw.ar(662, 0.2)];
+    b = [SinOsc.ar(442, 0, 0.2), Saw.ar(660, 0.2)];
+    Mix([a, b]).postln.scope;
+}.play;
+)
+
+
+// Subtractive Synthesis
+
+
+// Amplitude Modulation Synthesis
+
+
+//pulse wave
+
+// granular
+
+// wave table
+
+// Frequency Modulation Synthesis
+(
+SynthDef(\fmSynth, { |carrierFreq=440, carrierLvl=0.5, modulatorRatio=5, modulatorIndex=1.5, outputAmp=0.2, sig|
+
+	// the simple FM core
+	sig = LFSaw.ar(carrierFreq, 1, 0.5, 0.5) * carrierLvl;
+	sig = sig + SinOsc.ar(carrierFreq * modulatorRatio) * modulatorIndex;
+	sig = cos( sig * 2pi) * outputAmp * 0.06;
+	Out.ar(0, sig);
+}).add;
+)
+
+// At first start the synth:
+g = Synth(\fmSynth);
+
+// Play with the arguments:
+g.set(\carrierFreq, 880);
+g.set(\carrierFreq, 50);
+g.set(\carrierFreq, 100, \modulatorRatio, 5, \modulatorIndex, 0.5);
+g.set(\carrierFreq, 40, \modulatorRatio, 7, \modulatorIndex, 1.5);
+g.set(\carrierFreq, 955, \carrierLvl, 0.4, \modulatorRatio, 3, \modulatorIndex, 4);
+// ... etc.
+
+// To stop:
+g.free;
+
+
 //////// d ////////
 // filtering
 // LPF, RLPF, HPF, RHPF, BPF

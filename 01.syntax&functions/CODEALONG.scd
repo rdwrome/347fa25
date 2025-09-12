@@ -34,29 +34,14 @@ REMINDERS FROM last week's README.md
 // disorder of operations!
 // there is no order of operations in SuperCollider!
 // beware beware beware beware
-(
 (100+2/2).postln; // what does this equal?
 (100+(2/2)).postln; // force order of operations using parentheses
-)
 
-// variable assignment
-
-// step 1:
-
-(
+// assigning objects to variables
 a={"I love SuperCollider".postln};
-
 ~rachel={"SuperCollider loves me".postln;};
-)
-
-// step 2a: run the first
-
-a.value; // .value evaluates the function stored in "a" (another function object in sclang)
-
-// step 2b: run the second
-
+a.value;
 ~rachel.value;
-
 
 // arguments and variables of functions
 
@@ -65,7 +50,7 @@ a.value; // .value evaluates the function stored in "a" (another function object
 arg ;//old-school "pirate" notation
 | | //"pipe notation"
 */
-//variables are containers of a value
+//variables of a function are containers of a value
 // you need to declare them but not their type (which is good AND bad...)
 // local variables are hella local:
 a = 1;
@@ -73,25 +58,22 @@ a = 1;
 var a;
 a = 3;
 );
-a
-
-// step 1: create a function that contains both arguments and variables
+a;
+// a postln function with both an argument and variable:
 (
 a={
-	arg name; // arguments must be defined first
+	| urname | // arguments must be defined first
 	var something; // then variables must be defined next
 	something="SuperCollider"; // variables can be assigned later
-	(name++", do you like "++something++"?").postln;
+	(urname++", do you love "++something++"?").postln;
 };
-)
-
-// step 2: execute the function
-a.value("hello");
+);
+a.("Rachel");
 
 /* VERY IMPORTANT DISTINCTION: function arguments you can change on the fly, function variables can be assigned later but you have to reup the synth to the server. Again, in other words: function arguments can be passed to directly to server, but function variables have to be passed from the client to the server.
 
 // objects and messages
-// We can assign objects to variables, then send messages to those objects with the syntax `object.message`
+// We can assign objects to variables, and then send messages to those objects with the syntax `object.message`
 
 f = { "eggs".scramble };
 f.value;
@@ -147,61 +129,15 @@ x.free; // we can stop the synth running this line
 Server>Kill All Servers > KILLS ALL SERVERS (apocalypse)
 
 
+MUL and ADD in SinOSc UGen
+
+
 Let's get out of mono with Pan2:*/
 {Pan2.ar(SinOsc.ar(440))}.play;
 {Pan2.ar(SinOsc.ar(440), SinOsc.kr(4), SinOsc.ar(440))}.play // demo of .ar vs kr
 
 s.scope; // time domain
 
-// Additive synthesis
-
-(
-x = {
-
-	var freq = MouseX.kr(100, 1000, 1) / SampleRate.ir;
-	var distance = 3.00;
-	var index = MouseY.kr(0.42, 0.99);
-	var theta, beta, num, denom, son;
-
-	// Two phasors which will ramp from zero to 2pi as fancy oscillators
-	theta = Phasor.ar(0, freq, 0, 2pi);
-	beta  = Phasor.ar(0, freq * distance, 0, 2pi);
-
-	num = sin(theta) - (index * sin(theta - beta));
-	denom = 1 + index.squared - (2 * index * cos(beta));
-
-	son = num / denom;
-
-	Out.ar(0, Pan2.ar(son * 0.3)); // main mix or 'master' bus, first argument is just the index/location/proper name of the the bus itself
-
-}.freqscope; // frequency domain
-)
-
-// Frequency Modulation Synthesis
-(
-SynthDef(\fmSynth, { |carrierFreq=440, carrierLvl=0.5, modulatorRatio=5, modulatorIndex=1.5, outputAmp=0.2, sig|
-
-	// the simple FM core
-	sig = LFSaw.ar(carrierFreq, 1, 0.5, 0.5) * carrierLvl;
-	sig = sig + SinOsc.ar(carrierFreq * modulatorRatio) * modulatorIndex;
-	sig = cos( sig * 2pi) * outputAmp * 0.06;
-	Out.ar(0, sig);
-}).add;
-)
-
-// At first start the synth:
-g = Synth(\fmSynth);
-
-// Play with the parameters:
-g.set(\carrierFreq, 880);
-g.set(\carrierFreq, 50);
-g.set(\carrierFreq, 100, \modulatorRatio, 5, \modulatorIndex, 0.5);
-g.set(\carrierFreq, 40, \modulatorRatio, 7, \modulatorIndex, 1.5);
-g.set(\carrierFreq, 955, \carrierLvl, 0.4, \modulatorRatio, 3, \modulatorIndex, 4);
-// ... etc.
-
-// To stop:
-g.free;
 /*
 rachel's recommended UGens for output, read help files for all!
 Pan2

@@ -13,24 +13,26 @@
 ## Install [SuperCollider](https://supercollider.github.io/)
 
 ## Digital Audio 101 (MTEC-111 refresher?)
+- acoustic, analog, digital
+- pitch, amplitude, timbre
 - transducers
 - busses
 - A/D, D/A
 - sample rates
 - bit resolution/bit depth
-- amplitude
-- nyquist
+- nyquist theorem & limit
 - synthesis vs sampling (808 analog synthesis vs Linn LM-1 digital samples)
 - [Best Resource for This Information](https://cmtext.com/)
 
 ## Intro to Programming 101 (LMSC-261 refresher?)
-- float
 - integer
-- function
+- float
 - array
+- function
+
 
 ## Object - Oriented, based on smalltalk (old general use language)
-- **Encapsulation**
+- **Encapsulation/aggregation**
 - object: independent part of the program that manages itself (own rules and ways of doing things); a representation of something that you can control and send messages to
 - **Inheritance**
 - objects get their functions from classes

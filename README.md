@@ -3,22 +3,39 @@
 LMSC-261 & MTEC-111 are prerequisites.
 
 ## Topics
-- in the beginning/intro to supercollider (object-oriented programming language like python, written in c++)
-- syntax 
-- functions
-- synthdefs
-- synthesis
-- playback
-- effects
-- analysis
-- patterns
-	- Busses, Nodes, Groups
-- scheduling and sequencing
-	- Events, Routines, Tasks, Patterns
-	- NDef
-- modeling
-- guis
-- controllerism 
+#### in the beginning (september 5)
+
+#### syntax & functions(september 12)
+
+#### synthdefs & synthesis (september 19)
+
+#### playback & effects (september 26)
+
+#### NO CLASS october 3
+
+#### analysis how-to and 140 due (october 10)
+
+#### patterns (october 17)
+- Busses, Nodes, Groups
+
+#### scheduling & sequencing (october 24)
+- Scheduling and sequencing
+- Events, Routines, Tasks, Patterns
+- NDef
+
+#### analysis presentations(october 31)
+
+#### modeling (november 7)
+
+#### guis & controllerism (november 14)
+- final project proposal due
+
+#### Guest: [Carl Testa](http://carltesta.net/wfs.htm) & real-time wavefield synthesis in SC (november 21)
+
+#### (dec 5)
+- final project presentations
+
+#### OPTIONAL CONCERT TBD WEEK OF FINALS
 
 ### Everyday Tools
 * [SuperCollider](https://supercollider.github.io/)
@@ -96,7 +113,7 @@ Sharing is Caring Project|25%
 - If you have a question or comment about a grade, you must come ask it *in person* at my office hour.
 
 ### Attendance
-- The **(two)** lowest attendance grades will be dropped at the end of the semester.
+- The lowest attendance grade will be dropped at the end of the semester.
 - Remote attendance is not permitted.
 - You must attend class with the computer you're using for class projects (no phones, no tablets, no borrowed laptops). If you do not, you'll receive a partial (50 %) attendance grade for the week.
 - If you are more than 5 minutes late for class or leave more than 5 minutes early, you'll receive a partial attendance grade for the week.
