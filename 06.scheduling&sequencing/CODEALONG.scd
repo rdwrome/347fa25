@@ -141,51 +141,7 @@ Pprob(distribution, lo, hi, length, tableSize)
 Given an array of relative probabilities across the desired range (a histogram) representing an arbitrary distribution, generates random numbers corresponding to that distribution.
 */
 
-/*Envelopes
-  - Envelopes wrap around a sound to start and stop it
-  - Attack, Decay, Sustain, and Release most common type across electronic music
-  - SC can do sustaining (untimed) and un-sustaining envelopes (timed)
-    - sustaining: we don't know how it is going to end when it starts
-    - un-sustaining: we have to know how it is going to end when it starts
-    - Gates control sustaining envelopes (they can open and close)
-    - Triggers instigate un-sustaining envelopes
-  - **EnvGen** is the UGen to make envelopes (Envelope Generator!)*/
 
-//Shapes:
-
-Env.linen(1, 2, 3, 0.6).test.plot;
-Env.triangle(1, 1).test.plot;
-Env.sine(1, 1).test.plot;
-Env.perc(0.05, 1, 1, -4).test.plot;
-Env.asr(0.2, 0.5, 1, 1).test.plot;
-Env.adsr(0.2, 0.2, 0.5, 1, 1, 1).test.plot;
-Env.cutoff(1, 1).test(2).plot;
-Env.new([0, 0.5, 0.3, 1, 0], [2, 3, 1, 4],curve: [-5, 0, -5]).test.plot; //DIY shape
-
-// Done Actions:
-
-0 - Do nothing when the envelope has ended.
-1 - Pause the synth running, it is still resident.
-2 - Remove the synth and deallocate it.
-3 - Remove and deallocate both this synth and the preceding node.
-4 - Remove and deallocate both this synth and the following node.
-5 - Same as 3. If the preceding node is a group then free all members of the group.
-6 - Same as 4. If the following node is a group then free all members of the group.
-7 - Same as 3. If the synth is part of a group, free all preceding nodes in the group.
-8 - Same as 4. If the synth is part of a group, free all following nodes in the group.
-9 - Same as 2, but pause the preceding node.
-10 - Same as 2, but pause the following node.
-11 - Same as 2, but if the preceding node is a group then free its synths.
-12 - Same as 2, but if the following node is a group then free its synths.
-13 - Frees the synth and all preceding and following nodes.
-
-(
-SynthDef("envSynth", {var env;
-	env = EnvGen.kr(Env.linen(1, 2, 3, 0.6).test.plot, doneAction:0);
-	Out.ar(0, SinOsc.ar(200))})
-.add;
-)
-d= Synth("envSynth");
 
 /* Let's hook up Scale with PBind and TUNING systems!
 tuning systems: https://www.kylegann.com/tuning.html
@@ -196,6 +152,42 @@ Tuning.directory
 t = Tuning.et53;
 t.semitones;
 t.ratios.collect(_.round(0.001));
+
+m = Scale.minor.degrees; // Scale class returns the degrees of the minor scale
+
+Scale.directory
+Tuning.directory
+
+(
+SynthDef("erhu", { |out, amp = 0.1, freq = 440, decay = 5, coef = 0.1, pos = 0.5|
+var env, snd, t;
+env = EnvGen.kr(Env.linen(0, decay, 0), doneAction: 2);
+snd = Pluck.ar(
+        in: WhiteNoise.ar(amp),
+        trig: LatoocarfianN.ar(0),
+        maxdelaytime: 0.1,
+        delaytime: freq.reciprocal,
+        decaytime: decay,
+        coef: coef);
+	t = Tuning.lu;
+    Out.ar(out, PanAz.ar(4, snd, pos));
+}).add;
+)
+
+(
+~stringy = Pbind(
+	\instrument, 'erhu',
+	\root, -3,
+	\scale, Scale.hexPhrygian(t),
+    \degree, Pwhite(-6, 18),
+    \amp, Pwhite(0.1, 0.5),
+    \decay, Pwhite(7, 12),
+    \coef, Pwhite(0.01, 0.1),
+	\dur, Pxrand([0.1, 0.2, 0.4, 0.27, 0.13, 0.38, 0.76], inf),
+	\pos, Pgauss(0.0, 1.0, inf)
+).play;
+)
+~stringy.stop;
 
 (
 g = Pbind(\scale, Scale.chromatic(t), \degree, Pgauss(0, 53, inf), \dur, 0.25).play;

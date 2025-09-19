@@ -1,187 +1,76 @@
-// adapted from https://github.com/schollz/workshops
+/*Envelopes
+  - Envelopes wrap around a sound to start and stop a generating sound
+  - Attack, Decay, Sustain, and Release most common type across electronic music
+  - SC can do un-sustaining envelopes (timed) and sustaining (untimed)
+    - un-sustaining: we have to know how it is going to end when it starts
+    - sustaining: we don't know how it is going to end when it starts
+    - Gates control sustaining envelopes (they can open and close)
+  - **EnvGen** is the UGen to make envelopes (Envelope Generator!)*/
 
-/*SynthDefs
-- a class which pre-compiles multiple unit generators together on the server
-- greaaat for reuse!
-*/
+//Shapes:
 
-//////// a ////////
-// lets define a synth to use multiple times
-// using a "SynthDef"
+Env.linen(1, 2, 3, 0.6).test.plot;
+Env.triangle(1, 1).test.plot;
+Env.sine(1, 1).test.plot;
+Env.perc(0.05, 1, 1, -4).test.plot;
+Env.asr(0.2, 0.5, 1, 1).test.plot;
+Env.adsr(0.2, 0.2, 0.5, 1, 1, 1).test.plot;
+Env.cutoff(1, 1).test(2).plot;
+Env.new([0, 0.5, 0.3, 1, 0], [2, 3, 1, 4],curve: [-5, 0, -5]).test.plot; //DIY shape
+
+// Done Actions:
+
+0 - Do nothing when the envelope has ended.
+1 - Pause the synth running, it is still resident.
+2 - Remove the synth and deallocate it.
+3 - Remove and deallocate both this synth and the preceding node.
+4 - Remove and deallocate both this synth and the following node.
+5 - Same as 3. If the preceding node is a group then free all members of the group.
+6 - Same as 4. If the following node is a group then free all members of the group.
+7 - Same as 3. If the synth is part of a group, free all preceding nodes in the group.
+8 - Same as 4. If the synth is part of a group, free all following nodes in the group.
+9 - Same as 2, but pause the preceding node.
+10 - Same as 2, but pause the following node.
+11 - Same as 2, but if the preceding node is a group then free its synths.
+12 - Same as 2, but if the following node is a group then free its synths.
+13 - Frees the synth and all preceding and following nodes.
+
 
 (
-SynthDef("coolsynth",{ // add SynthDef here, with a name
-	arg freq=220, amp=0.1;
-	var snd;
-	snd=SinOsc.ar(freq:[freq,freq*2,freq*4],mul:[amp,amp/2,amp/8]);
-	snd=Mix.ar(snd);
-	snd=Splay.ar(snd);
-	Out.ar(0,snd);
-}).add; // use "add" instead of play
-)
-
-// now you can create multiple instances of them!
-(
-x = Synth("coolsynth",[\freq,60.midicps]);
-y = Synth("coolsynth",[\freq,62.midicps]);
-z = Synth("coolsynth",[\freq,65.midicps]);
-)
-
-// and each can be set later!
-(
-x.set(\freq,58.midicps);
-y.set(\freq,62.midicps);
-z.set(\freq,67.midicps);
-)
-
-(
-x.set(\freq,60.midicps);
-y.set(\freq,62.midicps);
-z.set(\freq,65.midicps);
-)
-
-// set them all free!
-(
-x.free;
-y.free;
-z.free;
-)
-
-
-//////// b ////////
-// you can treat UGens like numbers because of OOP!
-// let's add them together and make a new oscillator
-// famous oscillator UGens to play with:
-// SinOsc, LFSaw, Tri
-(
-SynthDef("coolsynth",{
-	arg freq=110, amp=0.5;
-	var snd;
-	// you can directly Mix
-	snd=Mix.ar(
-		SinOsc.ar(freq:[freq,freq*5,freq*8],mul:[amp,amp/2,amp/4])
+SynthDef('subwithunsustain', {
+	var sig, env;
+	sig = RLPF.ar(
+		Saw.ar(200),
 	);
-	// lets add some harmonic from a saw wave
-	snd=snd+(0.1*Mix.ar(
-		Saw.ar(freq:[freq,freq*2,freq*3,freq*4],mul:[amp,amp/1,amp/3,amp/3]))
-	);
-	snd=Splay.ar(snd);
-	Out.ar(0,snd);
+	env = Env.triangle(1, 1);
+	Out.ar(0, Pan2.ar(sig*EnvGen.kr(env, doneAction:2)));
 }).add;
 )
-x = Synth("coolsynth");
-x.free;
+x = Synth('subwithunsustain');
 
-/* interlude on arrays vs lists
-  - Array: fixed size collection (most common)
-  - List: variable size collection
-  - What are tuning systems but arrays and lists?*/
-m = Scale.minor.degrees; // Scale class returns the degrees of the minor scale
-
-Tuning.directory // which scales
-
-//////// c ////////
-// use Array.fill(<num>,{arg i; <code>})
-// to easily create an additive synth
 
 (
-SynthDef("coolsynth",{
-	arg freq=110, amp=0.5;
-	var snd;
-	// you can directly Mix
-	snd=Mix.ar(
-		Array.fill(2,{arg i; SinOsc.ar(freq:freq*(2**i),mul:amp/(2**i))})
-	);
-	// lets add some harmonic from a saw wave
-	snd=snd+(0.1*Mix.ar(
-		Array.fill(4,{arg i; Saw.ar(freq:freq*(i+1),mul:amp/(i+1))}))
-	);
-	snd=Splay.ar(snd);
-	Out.ar(0,snd);
+SynthDef(\subwithsustain, { |gate=1|
+    var sig, env;
+    sig = RLPF.ar(
+        Saw.ar(200, 0.3),   // saw with amplitude
+        800,                // cutoff frequency
+        0.3                 // resonance (rq)
+    );
+    env = Env.adsr(0.01, 0.2, 0.7, 0.5);
+    sig = sig * EnvGen.kr(env, gate, doneAction:2);
+    Out.ar(0, Pan2.ar(sig));
 }).add;
 )
-x = Synth("coolsynth");
-x.free;
-// your turn!
-// take the synth in c and try changing things, including:
-// - try changing the oscillators (try VarSaw, SinOsc, Pulse, LFTri, Saw, ..)
-// - try changing the frequency
-// - try changing the number of oscillators (instead of 3, do 1, 2, ..)
+
+// play it
+x = Synth(\subwithsustain);
+
+// release it
+x.set(\gate, 0);
 
 
-//////// d ////////
-// filtering
-// LPF, RLPF, HPF, RHPF, BPF
-// MoogLadder, MoogVCF, MoogFF
-(
-SynthDef("filtersynth",{
-	arg freq=220;
-	var snd;
-	var lpf, res;
-	snd = Saw.ar([freq,freq+2]); // create a saw wave
-	snd = snd * (-6.dbamp); // decrease volume by 6 dB
 
-	lpf = Clip.kr(MouseX.kr(20,20000,1),20,20000); // add mouse modulation to lpf
-	res = Clip.kr(MouseY.kr(1,0.02),0.1,1); // add mouse modulation to resonance
-	snd = RLPF.ar(snd,lpf,res); // resonant low-pass filter
-	Out.ar(0,snd); // output the send
-}).add;
-)
-y = Synth("filtersynth");
-y.free;
-
-//////// e ////////
-// combining modulation + filter
-(
-SynthDef("filtersynth", {
-	arg freq = 110;
-	var snd;
-	var lpf, res;
-	snd = Saw.ar([freq,freq-1]); // create a saw wave
-
-	snd = snd * -12.dbamp; // reduce volume by 12 dB
-
-	lpf = LFNoise2.kr(1).range(freq,4000);
-	res = LFNoise2.kr(1).range(0.5,1);
-	snd = RLPF.ar(snd,lpf, res); // resonant low-pass filter
-
-	Out.ar(0,snd); // output the send
-}).add;
-)
-y = Synth("filtersynth");
-y.free;
-
-
-//////// g ////////
-///midisynth
-(
-SynthDef("midisynth",
-{
-	arg note=32;
-	var detune=0.1;
-	var snd;
-	var lpf, res;
-	snd = {
-		var freq = (note+LFNoise0.kr(1).range(detune.neg,detune)).midicps; // add detuning to note and then convert to midi
-		var snd_ = Pulse.ar(freq,LFNoise2.kr(3).range(0.2,0.8)); // create a pulse wave with pwm
-		snd_ = snd_ * -6.dbamp; // reduce volume by 12 dB
-		lpf = LFNoise2.kr(1).exprange(100,Rand(1000,5000));
-		res = LFNoise2.kr(1).range(0.1,1);
-		snd_ = RLPF.ar(snd_,lpf, res); // resonant low-pass filter
-		snd_ // return sound
-	}!8;
-
-	snd = Splay.ar(snd); // make a stereo field out of all the channels
-
-	Out.ar(0,snd); // output the send
-}).add
-)
-z = Synth("midisynth");
-z.free;
-
-// adapted from https://github.com/schollz/workshops
-
-// don't forget to BOOT!
 
 //////// a ////////
 // to play samples we first need to load a sample into a "buffer" using a file or recording

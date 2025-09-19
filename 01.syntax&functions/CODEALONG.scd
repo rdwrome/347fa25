@@ -28,7 +28,7 @@ REMINDERS FROM last week's README.md
 "hello, world".postln;// make sure to always have a ";" after statements
 
 // objects and messages
-// We can assign objects to variables, and then send messages to those objects with the syntax `object.message` messages will be received (and sent) based on an object's methods
+// We can assign objects to variables, and then send messages to those objects with the syntax `object.message.` messages will be received (and sent) based on an object's methods
 
 ~breakfast = { "eggs".scramble };
 ~breakfast.value;
@@ -84,21 +84,19 @@ arg ;//old-school "pirate" notation
  s.meter;
  s.record;
  s.stopRecording;
- s.scope; // time domain
- s.freqscope; // frequency domain
- s.addr // the address of the server (IP address and Port)
- s.name // the localhost server is the default server (see Main.scd file)
- s.serverRunning // is it running?
- s.avgCPU // how much CPU is it using right now?
+ s.scope; // time domain!!!
+ s.freqscope; // frequency domain!!!
 
 /* UGens
 - Modular building blocks of SuperCollider Systems for synthesis; sound design; algorithmic composition
 - In SC they're actually written in C/C++ and are a plugin to the SC Audio Server, but most come standard with download
 - Most UGen classes have Audio Rate **.ar** and Control Rate **.kr** signal methods internal to the language
-- AR = sends 44.1k values per second; KR = sends 7,350 values per second (1/6th as many as ar. Just saves CPU this way!...like difference between VCO and LFO modules in a modular synth).
+- AR = sends 44.1k values per second; KR = sends 7,350 values per second (1/6th as many as ar. Just saves CPU this way!...like difference between VCO and LFO modules in an analog modular synthesizer).
 - LOOK UP THE arguments OF UGens with <<Command|D>> ALL THE TIME
 - SinOsc is the "hello, world" of computer music.
-- Look at Mul and Add methods of SinOsc in its help file*/
+- Look at Mul and Add methods of SinOsc in its help file
+https://doc.sccode.org/Guides/Tour_of_UGens.html
+*/
 
 (
 ~orange={
@@ -127,12 +125,12 @@ Let's get out of mono with Pan2:*/
 ~kiwi.set(\pan, 4)
 ~kiwi.free;
 
-//Why the pop sound? because the phase is interrupted
+//Why the pop sound? because the phase is interrupted. We don't have envelopes yet!
 
 /*
 UGens you should know for output, read help files for all!
 Pan2 // Rachel Recommends for Stereo Field
-Out // For sending signals directly to the bus that goes to your Output (we'll talk more about busses soon)
+Out // For sending signals directly to the bus that goes to your hardware Output Device ("master")
 Mix // Great for simple submixing, adding a bunch of channels together
 Splay // Great for complex submixing, spreading a bunch of channels across the Stereo Field
 PanAz // Multi-channel panning gold!
