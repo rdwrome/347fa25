@@ -70,6 +70,8 @@ x = Synth(\subwithsustain);
 x.set(\gate, 0);
 
 
+///// adapted from https://github.com/schollz/workshops
+
 
 
 //////// a ////////
@@ -90,14 +92,14 @@ x.set(\gate, 0);
 
 (
 {
-	var snd; // define a variable to hold our sound
-	snd=PlayBuf.ar( // PlayBuf will play a sound in a buffer
+	var sig; // define a variable to hold our sound
+	sig=PlayBuf.ar( // PlayBuf will play a sound in a buffer
 		numChannels:2, // we are dealing with stereo samples, so 2 channels
 		bufnum:~kalimba, // the buffer
 		rate: -0.2,
 		loop:1,
 	);
-	Out.ar(0,snd); // send to Out UGen to channel 0 (default speakers)
+	Out.ar(0,sig); // send to Out UGen to channel 0 (default speakers)
 }.play; // .play will play the sound immediately!
 )
 
@@ -128,16 +130,16 @@ SynthDef("musicboxa", {
 	// buffers have an index, and the buffer index will be supplied later using
 
 	|bufnum = 0|
-	var snd;
+	var sig;
 
-	snd=PlayBuf.ar(
+	sig=PlayBuf.ar(
 		numChannels:2,
 		bufnum:bufnum,
 		loop: 1,                     // loop forever
 		rate:BufRateScale.kr(bufnum) // BufRateScale will calculate the
 	);                               // difference between the server sampling and the audio file
 
-	Out.ar(0,snd);
+	Out.ar(0,sig);
 }).add; // .add will add it to our server to be used anytime we want!
 )
 
@@ -151,28 +153,25 @@ SynthDef("musicboxa", {
 //////// f ////////
 // now lets create a synthdef with some modulation
 (
-SynthDef("musicboxb", {
+SynthDef("musicboxb", { |bufnum = 0|
 
-	arg bufnum = 0;
-
-	var snd;
-	var rate;
+	var sig, rate;
 
 	rate = BufRateScale.kr(bufnum)*MouseX.kr(0.9,1.1); // use the mouse to modulate the rate
 
-	snd=PlayBuf.ar(
+	sig=PlayBuf.ar(
 		numChannels:2,
 		bufnum:bufnum,
 		loop: 1,
 		rate: rate,
 	);
 
-	snd = Pan2.ar(snd,LFNoise2.kr(1)); // use "LFNoise2" to modulate panning randomly
+	sig = Pan2.ar(sig,LFNoise2.kr(1)); // use "LFNoise2" to modulate panning randomly
 
-	snd[0] = snd[0] * LFPar.ar(5).range(0,1); // use "LFPar" to modulate the amplitude
-	snd[1] = snd[1] * LFPar.ar(5.1).range(0,1); // use "LFPar" to modulate the amplitude slightly differently
+	sig[0] = sig[0] * LFPar.ar(5).range(0,1); // use "LFPar" to modulate the amplitude
+	sig[1] = sig[1] * LFPar.ar(5.1).range(0,1); // use "LFPar" to modulate the amplitude slightly differently
 
-	Out.ar(0,snd);
+	Out.ar(0,sig);
 }).add; // .add will add it to our server to be used anytime we want!
 )
 
@@ -193,26 +192,26 @@ x=Synth("musicboxb", [\bufnum, ~box]); // will start playing
 SynthDef("musicboxc", {
 	// buffers have an index, and the buffer index will be supplied later using
 	// an argument, "arg":
-	arg bufnum = 0;
+	| bufnum = 0 |
 	// after arguments, we will declare variables that we will use with "var":
-	var snd;
+	var sig;
 
-	snd=PlayBuf.ar(
+	sig=PlayBuf.ar(
 		numChannels:2,
 		bufnum:bufnum,
 		loop: 1,                     // loop forever
 		rate:BufRateScale.kr(bufnum) // BufRateScale will calculate the
 	);                               // difference between the server sampling
 
-	snd = Pan2.ar(snd,BrownNoise.kr(1)); // pans randomly left and right
+	sig = Pan2.ar(sig,BrownNoise.kr(1)); // pans randomly left and right
 
-	snd = RLPF.ar(snd, MouseX.kr(10,20000,1),0.5); // effects controlled by mouse!
+	sig = RLPF.ar(sig, MouseX.kr(10,20000,1),0.5); // effects controlled by mouse!
 
-	snd = CombC.ar(snd,0.5,MouseY.kr(0.05,0.5)); // add delay
+	sig = CombC.ar(sig,0.5,MouseY.kr(0.05,0.5)); // add delay
 
-	snd = (snd * SinOsc.kr(0.1).range(1,10)).tanh * 0.1; // add distortion
+	sig = (sig * SinOsc.kr(0.1).range(1,10)).tanh * 0.1; // add distortion
 
-	Out.ar(0,snd);
+	Out.ar(0,sig);
 }).add; // .add will add it to our server to be used anytime we want!
 )
 
