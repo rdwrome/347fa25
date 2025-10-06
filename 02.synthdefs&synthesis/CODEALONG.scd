@@ -91,15 +91,16 @@ x = Synth('rdRLPF');
   - **EnvGen** is the UGen to make envelopes (Envelope Generator!)*/
 
 //Shapes:
-
+//unsustaining
 Env.linen(1, 2, 3, 0.6).test.plot;
 Env.triangle(1, 1).test.plot;
 Env.sine(1, 1).test.plot;
 Env.perc(0.05, 1, 1, -4).test.plot;
+//sustaining
 Env.asr(0.2, 0.5, 1, 1).test.plot;
 Env.adsr(0.2, 0.2, 0.5, 1, 1, 1).test.plot;
 Env.cutoff(1, 1).test(2).plot;
-Env.new([0, 0.5, 0.3, 1, 0], [2, 3, 1, 4],curve: [-5, 0, -5]).test.plot; //DIY shape
+Env.new([0, 0.5, 0.3, 1, 0], [2, 3, 1, 4],curve: [-5, 0, -5]).test.plot; //DIY shape (first array is levels, second array is times)
 
 // Done Actions:
 
@@ -136,9 +137,7 @@ x = Synth('subwithunsustain');
 SynthDef(\subwithsustain, { |gate=1|
     var sig, env;
     sig = RLPF.ar(
-        Saw.ar(200, 0.3),   // saw with amplitude
-        800,                // cutoff frequency
-        0.3                 // resonance (rq)
+        Saw.ar(200, 0.3),
     );
     env = Env.adsr(0.01, 0.2, 0.7, 0.5);
     sig = sig * EnvGen.kr(env, gate, doneAction:2);
@@ -151,6 +150,7 @@ x = Synth(\subwithsustain);
 
 // release it
 x.set(\gate, 0);
+
 
 
 /* arrays vs lists

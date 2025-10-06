@@ -1,78 +1,4 @@
-/*Envelopes
-  - Envelopes wrap around a sound to start and stop a generating sound
-  - Attack, Decay, Sustain, and Release most common type across electronic music
-  - SC can do un-sustaining envelopes (timed) and sustaining (untimed)
-    - un-sustaining: we have to know how it is going to end when it starts
-    - sustaining: we don't know how it is going to end when it starts
-    - Gates control sustaining envelopes (they can open and close)
-  - **EnvGen** is the UGen to make envelopes (Envelope Generator!)*/
-
-//Shapes:
-
-Env.linen(1, 2, 3, 0.6).test.plot;
-Env.triangle(1, 1).test.plot;
-Env.sine(1, 1).test.plot;
-Env.perc(0.05, 1, 1, -4).test.plot;
-Env.asr(0.2, 0.5, 1, 1).test.plot;
-Env.adsr(0.2, 0.2, 0.5, 1, 1, 1).test.plot;
-Env.cutoff(1, 1).test(2).plot;
-Env.new([0, 0.5, 0.3, 1, 0], [2, 3, 1, 4],curve: [-5, 0, -5]).test.plot; //DIY shape
-
-// Done Actions:
-
-0 - Do nothing when the envelope has ended.
-1 - Pause the synth running, it is still resident.
-2 - Remove the synth and deallocate it.
-3 - Remove and deallocate both this synth and the preceding node.
-4 - Remove and deallocate both this synth and the following node.
-5 - Same as 3. If the preceding node is a group then free all members of the group.
-6 - Same as 4. If the following node is a group then free all members of the group.
-7 - Same as 3. If the synth is part of a group, free all preceding nodes in the group.
-8 - Same as 4. If the synth is part of a group, free all following nodes in the group.
-9 - Same as 2, but pause the preceding node.
-10 - Same as 2, but pause the following node.
-11 - Same as 2, but if the preceding node is a group then free its synths.
-12 - Same as 2, but if the following node is a group then free its synths.
-13 - Frees the synth and all preceding and following nodes.
-
-
-(
-SynthDef('subwithunsustain', {
-	var sig, env;
-	sig = RLPF.ar(
-		Saw.ar(200),
-	);
-	env = Env.triangle(1, 1);
-	Out.ar(0, Pan2.ar(sig*EnvGen.kr(env, doneAction:2)));
-}).add;
-)
-x = Synth('subwithunsustain');
-
-
-(
-SynthDef(\subwithsustain, { |gate=1|
-    var sig, env;
-    sig = RLPF.ar(
-        Saw.ar(200, 0.3),   // saw with amplitude
-        800,                // cutoff frequency
-        0.3                 // resonance (rq)
-    );
-    env = Env.adsr(0.01, 0.2, 0.7, 0.5);
-    sig = sig * EnvGen.kr(env, gate, doneAction:2);
-    Out.ar(0, Pan2.ar(sig));
-}).add;
-)
-
-// play it
-x = Synth(\subwithsustain);
-
-// release it
-x.set(\gate, 0);
-
-
 ///// adapted from https://github.com/schollz/workshops
-
-
 
 //////// a ////////
 // to play samples we first need to load a sample into a "buffer" using a file or recording
@@ -96,7 +22,7 @@ x.set(\gate, 0);
 	sig=PlayBuf.ar( // PlayBuf will play a sound in a buffer
 		numChannels:2, // we are dealing with stereo samples, so 2 channels
 		bufnum:~kalimba, // the buffer
-		rate: -0.2,
+		rate: 0.5,
 		loop:1,
 	);
 	Out.ar(0,sig); // send to Out UGen to channel 0 (default speakers)
@@ -147,7 +73,7 @@ SynthDef("musicboxa", {
 //////// e  ////////
 // now let's play our defined synth using the "Synth" function
 // we can then create a synth that plays a sound!
-~syn=Synth("musicboxa",[\bufnum,~kalimba]);
+~syn=Synth("musicboxa",[\bufnum,~me]);
 ~syn.free; // will stop playing
 
 //////// f ////////
@@ -166,12 +92,7 @@ SynthDef("musicboxb", { |bufnum = 0|
 		rate: rate,
 	);
 
-	sig = Pan2.ar(sig,LFNoise2.kr(1)); // use "LFNoise2" to modulate panning randomly
-
-	sig[0] = sig[0] * LFPar.ar(5).range(0,1); // use "LFPar" to modulate the amplitude
-	sig[1] = sig[1] * LFPar.ar(5.1).range(0,1); // use "LFPar" to modulate the amplitude slightly differently
-
-	Out.ar(0,sig);
+	Out.ar(0,Pan2.ar(sig));
 }).add; // .add will add it to our server to be used anytime we want!
 )
 
@@ -355,7 +276,7 @@ s.waitForBoot({
 
 	Routine {
 		// either load a file into the tape
-		u.loadTape(tape:1,filename:thisProcess.nowExecutingPath.dirname++"/whale.wav");
+		u.loadTape(tape:1,filename:thisProcess.nowExecutingPath.dirname++"/musicbox.wav");
 		// OR record another tape and play it
 		// u.recordTape(tape:1,seconds:3,recLevel:2); 3.5.wait;
 

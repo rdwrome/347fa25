@@ -1,4 +1,4 @@
-# my favorite SuperCollider works from the most recent symposium
+# my favorite SuperCollider works from the most recent SC symposium
 
 ## [Return to Tomorrow by Michael Webster](https://vimeo.com/944533415/eb2092574a)
 
