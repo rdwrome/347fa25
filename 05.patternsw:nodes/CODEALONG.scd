@@ -1,6 +1,9 @@
 // adapted from: https://doc.sccode.org/Tutorials/A-Practical-Guide/PG_01_Introduction.html
 
 /*
+
+BUSSES, NODES, & STREAMS
+
 Busses
 Generally your analog definition works: how we route audio to new places, but they're actually a little more complicated than that.
 
@@ -13,7 +16,7 @@ This means that there is a STEREO bus called "0" on the server RECEIVING 1 STREA
 
 So, what's a Stream?
 
-SC puts abstract objects (meaning we don't necessarily explicitly declare them) on busses on the server that wait to receive messages. Nodes are the most common of these types of objects (related to the "Node Not Found" error message we got last week). Messages travel to Nodes and other abstract objects on Streams.
+SC puts abstract objects (meaning we don't necessarily explicitly declare them) on busses on the server that wait to receive messages. Nodes are the most common of these types of objects. Messages travel to Nodes and other abstract objects on Streams.
 
 There is a special type of Stream called an Event Stream which basically allows the Stream to continue to deliver messages but Nodes can start and stop doing the things ON the messages.
 
@@ -750,127 +753,6 @@ Pprob(distribution, lo, hi, length, tableSize)
 Given an array of relative probabilities across the desired range (a histogram) representing an arbitrary distribution, generates random numbers corresponding to that distribution.
 */
 
-
-/*
-Routines & Tasks:
-  - Pattern-less passing of messages to streams
-  - Need to sync things with clocks?
-    - SystemClock: Most reliable
-    - TempoClock: Best for beats
-  - Need to start and stop full iterations with clocks?
-    - **Routine**
-  - Need to start, stop, and pause iterations without clocks?
-    - **Task**
-https://doc.sccode.org/Tutorials/Getting-Started/15-Sequencing-with-Routines-and-Tasks.html
-WAIT == YIELD
-*/
-(
-SynthDef(\bleep,{ arg out=0, note=60, amp=0.5, pan=0.0;
-	var freq, env;
-	freq = note.midicps;
-	env = EnvGen.ar(
-					Env([0,1,1,0],[0.01, 0.1, 0.2]),
-					levelScale:amp,
-					doneAction:2
-				);
-	Out.ar(out,
-		Pan2.ar(Blip.ar(freq) * env, pan)
-	)
-}).add;
-)
-/// SystemClock
-(
-
-SystemClock.sched(0.0,//start at 0.0 sec from now, i.e. immediately
-
-	{//a function which states what you wish to schedule
-
-		Synth(\bleep);
-
-		1		//repeat every second
-
-	}
-
-))
-/// TempoClock
-(
-var t;
-t = TempoClock(2); // 120 bpm = 2 beats per second
-t.schedAbs(0, { arg ... args;
-				args.postln;
-				Synth(\bleep);// make a bleep
-				1.0	// reschedule every beat
-}))
-/// Simple Routine
-(
-r = Routine({
-		1.wait;
-		Synth(\bleep);
-		5.wait;
-		Synth(\bleep);
-	});
-)
-///
-r.play;
-
-/// Simple Task
-
-(SynthDef(\singrain, { |freq = 440, amp = 0.2, sustain = 1, out|
-    var sig;
-    sig = SinOsc.ar(freq, 0, amp) * EnvGen.kr(Env.perc(0.1, sustain), doneAction: Done.freeSelf);
-    Out.ar(out, sig ! 2);    // sig ! 2 is the same as [sig, sig]
-}).add;);
-
-
-(
-t = Task({
-    loop {
-        [60, 62, 64, 65, 67, 69, 71, 72].do({ |midi|
-            Synth(\singrain, [freq: midi.midicps, amp: 0.2, sustain: 0.1]);
-            1.wait;
-        });
-    }
-}).play;
-)
-
-// probably stops in the middle of the scale
-t.stop;
-
-t.play;    // should pick up with the next note
-
-t.stop;
-
-/***Forks**
-    - Routine shortcut. Wraps routine into .play and allows you to pass a clock into it.
-    - Because SC is totally OOP, have to use an object method to iterate
-    - **.do** is the most common*/
-
-(3.do({ "threescrambledeggs".scramble.postln; }))
-
-(
-{8.do{arg i; Synth(\bleep,
-	[\note,rrand(48,84) ,\amp, rrand(0.25,0.75)]); 2.wait} }.fork(TempoClock(5))
-)
-
-// APP CLOCK for guis
-
-(
-var w, r;
-w = Window.new("trem", Rect(512, 256, 360, 130));
-w.front;
-r = Routine({ arg appClockTime;
-    ["AppClock has been playing for secs:",appClockTime].postln;
-    60.do({ arg i;
-        0.05.yield;
-        w.bounds = w.bounds.moveBy(10.rand2, 10.rand2);
-        w.alpha = cos(i*0.1pi)*0.5+0.5;
-    });
-    1.yield;
-    w.close;
-});
-AppClock.play(r);
-)
-
 // dictionaries https://doc.sccode.org/Classes/Dictionary.html
 a = (note: 2);
 b = (note: [3, 5]);
@@ -889,3 +771,63 @@ Prand([a, b, c], inf).play;
 // change the events while playing
 c[\freq] = [900, 1002, 1102];
 c[\freq] = [200, 101, 1102];
+
+
+// NDef;
+
+(
+s.waitForBoot{
+
+	SynthDef(\p, {|out= 0, freq= 400, amp= 0.1, gate= 1, detune= 0|
+		var env= EnvGen.ar(Env.perc(Rand(0.001, 0.01), LinRand(0.2, 0.4), amp, Rand(-9, -1)), doneAction:2);
+		var snd= Mix(SinOsc.ar(freq+[0, detune*0.1], env*2pi));
+		Out.ar(out, Pan2.ar(snd*env, Rand(-1, 1)));
+	}).add;
+	Ndef(\p, Pspawn(Pbind(\method,\par,\delta,1/8,\pattern,{Pbind(\instrument, \p, \dur,a=Pseq((1..9).sputter),\sustain,1/8/a,\degree,a,\detune,a)})));
+	Ndef(\p).play(vol:0.5);
+
+	Ndef(\t, {
+		var mod= Saw.ar([3, 4], Saw.ar(1, 32, 128), Duty.ar(1, 0, flop(Dseq([0, 8, 1, 5])*[1, 4, 8])));
+		var snd= SinOsc.ar(Saw.ar(2, 64, 99), mod)/9;
+		CombN.ar(snd, 1/4, 1/4.125, SinOsc.kr(0.005, 1.5pi).range(0, 6));
+	});
+	Ndef(\t).play(vol:0.5);
+
+	Routine.run({
+		var cnt= 1;
+		loop{
+			var syn;
+			cnt= cnt%8+1;
+			syn= {
+				var del= DelayN.ar(InFeedback.ar(0, 2)+(InFeedback.ar(100, 2)), 1, 1);
+				SinOsc.ar(cnt*99+[0, 2], del[1..0])/4;
+			}.play(outbus: 64);
+			{syn.release(16)}.defer(9-cnt);
+			wait(9-cnt);
+		};
+	});
+	Ndef(\c, {InFeedback.ar(64, 2)}).play(vol:0.5);
+
+	Ndef(\r, {
+		var lfos= LFNoise1.ar(0.5!2);
+		var snd= Crackle.ar(lfos.range(1.8, 1.98));
+		Formlet.ar(snd, TExpRand.ar(200, 2000, lfos).lag(2), lfos.range(5e-4, 1e-3), 0.0012);
+	});
+	Ndef(\r).play(vol:0.25);
+
+	Routine.run({
+		loop{
+			var syn= {
+				var snd= Pluck.ar(Crackle.ar([1.9, 1.8]), Mix(Impulse.ar({5.linrand+1}!2, -0.125)), 0.05, 0.05.linrand);
+				BPF.ar(snd, 2000.rand+100, 0.25.rrand(1.75));
+			}.play(s, 62, 18);
+			{syn.release(69)}.defer(18);
+			wait(18);
+		};
+	});
+	Ndef(\m, {InFeedback.ar(62, 2)*SinOsc.kr(0.006).range(0.25, 1)}).play(vol:0.5);
+
+	NdefMixer(s);
+	s.meter;
+};
+)
