@@ -1,7 +1,3 @@
-//140 Characters DUE/PLAYED IN CLASS
-
-//ANALYSIS IS COMING!
-
 // Vera Molnar: Hommage à Duerer (1948-92)
 
 (

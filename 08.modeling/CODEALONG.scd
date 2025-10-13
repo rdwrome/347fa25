@@ -45,9 +45,9 @@ Ndef(\verb, {
 	var input, output, delrd, sig, deltimes;
 
 	// Choose which sort of input you want by (un)commenting these lines:
-	//input = Pan2.ar(PlayBuf.ar(1, b, loop: 1), -0.5); // buffer playback, panned halfway left
+	input = Pan2.ar(PlayBuf.ar(1, b, loop: 1), -0.5); // buffer playback, panned halfway left
 	//input = SoundIn.ar([0,1]); // TAKE CARE of feedback - use headphones
-	input = Dust2.ar([0.1, 0.01]); // Occasional clicks
+	//input = Dust2.ar([0.1, 0.01]); // Occasional clicks
 
 	// Read our 4-channel delayed signals back from the feedback loop
 	delrd = LocalIn.ar(4);

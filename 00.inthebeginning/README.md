@@ -36,15 +36,12 @@
 - object: independent part of the program that manages itself (own rules and ways of doing things); a representation of something that you can control and send messages to
 - **Inheritance**
 - objects get their functions/methods from classes
-- class: template, blueprint for creating objects
+- class: template, blueprint for creating objects, specific instances
 - superclass is parent, class is child
 - class inherits attributes of parent (through abstraction) but modifies, evolves
 - classes are reusable
 - **Polymorphism**
-- change the way something works by overriding and overloading
-- change type, have multiple types work together
-- overriding: walk backwards
-- overloading: walk to run 
+- produce different results when applied to different objects, e.g. file a paper, file metal (Fieldsteel, 6)
 
 ## [Open Sound Control](https://ccrma.stanford.edu/groups/osc/index.html)
 - Client and Server communicate in OSC messages

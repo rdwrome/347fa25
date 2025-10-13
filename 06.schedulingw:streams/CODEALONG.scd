@@ -85,8 +85,6 @@ t.stop;
 
 t.play;    // should pick up with the next note
 
-t.stop;
-
 /***Forks**
     - Routine shortcut. Wraps routine into .play and allows you to pass a clock into it.
     - Because SC is totally OOP, have to use an object method to iterate
