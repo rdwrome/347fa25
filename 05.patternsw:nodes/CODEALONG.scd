@@ -46,7 +46,7 @@ Pbind(
 (
 Pbind(
   \midinote, Pseq([60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60,67, 67, 65, 65, 64, 64, 62,67, 67, 65, 65, 64, 64, 62,60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60]),
-  \dur, Pseq([1, 1, 1, 1, 1, 1, 2], 6)
+	\dur, (Pseq([1, 1, 1, 1, 1, 1, 2], 6)*0.6)
 ).play
 )
 
@@ -68,22 +68,24 @@ var b = [67, 67, 65, 65, 64, 64, 62];
 
 Pbind(
   \midinote, Pseq(a) ++ Pseq(b, 2) ++ Pseq(a),
-  \dur, Pseq([1, 1, 1, 1, 1, 1, 2], 6),
+	\dur, (Pseq([1, 1, 1, 1, 1, 1, 2], 6)*0.03),
 ).play
 )
 
 // and more
+
+Scale.directory
 
 (
 var a = Pseq([0, 0, 4, 4, 5, 5, 4, 3, 3, 2, 2, 1, 1, 0]);
 var b = Pseq([4, 4, 3, 3, 2, 2, 1]);
 
 Pbind(
-  \scale, Scale.major, // lc
-  \root, 0, // lc
+  \scale, Scale.prometheus, // lc
+  \root, 6, // lc
   \octave, 5,
   \degree, a ++ b ++ b ++ a,
-  \dur, Pseq([1, 1, 1, 1, 1, 1, 2], 6),
+	\dur, (Pseq([1, 1, 1, 1, 1, 1, 2], 6))*0.5,
 ).play
 )
 
@@ -112,12 +114,12 @@ var progA = Pseq([c, f, c, f, c, g7, c]);
 var progB = Pseq([c, f, c, g7, c, f, c, g7]);
 
 var a = [60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60];
-var b = [67, 67, 65, 65, 64, 64, 62];
+var b = [67, 6, 65, 65, 64, 64, 62];
 
 var prog = Pbind(
 	\octave, 5,
 	\degree, progA ++ progB ++ progB,
-	\dur, Pseq([4, Pseq([2], 14), 4, Pseq([2], 6)]));
+	\dur, Pseq([4, Pseq([2], 14), 4, Pseq([2], 6)])));
 
 var melody = Pbind(
 	\midinote, (Pseq(a) ++ Pseq(b, 2) ++ Pseq(a)) + 12,
@@ -142,7 +144,7 @@ SynthDef(\cfstring1, { arg i_out, freq = 360, gate = 1, pan, amp=0.1;
 }).add;
 
 e = Pbind(
-    \degree, Pseq((0..12), inf),
+    \degree, Pseq((-12..24), inf),
     \dur, 0.2,
     \instrument, \cfstring1
 ).play; // returns an EventStream
@@ -155,6 +157,8 @@ e.reset
 e.mute; // keeps playing, but replaces notes with rests
 e.unmute;
 )
+
+// WHAT IS YOUR CODE ANALYSIS PROJECT?
 
 /*Simple Pattern UGens to go with PBind from https://doc.sccode.org/Browse.html#Streams-Patterns-Events
   - **Pseq**
@@ -248,12 +252,7 @@ Poisson distribution.
 Pprob(distribution, lo, hi, length, tableSize)
 Given an array of relative probabilities across the desired range (a histogram) representing an arbitrary distribution, generates random numbers corresponding to that distribution.
 */
-
-// dictionaries https://doc.sccode.org/Classes/Dictionary.html
-a = (note: 2);
-b = (note: [3, 5]);
-Pseq([a, b]).play;
-
+(
 (
 a = (
     pattern: Pbind(\note, Pgeom(1, 1.1, { 20.rand }), \dur, 0.05),
@@ -262,6 +261,7 @@ a = (
 b = (note: [3, 5]);
 c = (freq: 402, dur: 0.3);
 Prand([a, b, c], inf).play;
+)
 )
 
 // change the events while playing
