@@ -34,7 +34,7 @@ SystemClock.sched(0.0,//start at 0.0 sec from now, i.e. immediately
 
 		Synth(\bleep);
 
-		1		//repeat every second
+		1		//repeat every second. floating point and ratios work
 
 	}
 
@@ -96,6 +96,8 @@ t.play;    // should pick up with the next note
 {8.do{arg i; Synth(\bleep,
 	[\note,rrand(48,84) ,\amp, rrand(0.25,0.75)]); 2.wait} }.fork(TempoClock(5))
 )
+
+// Using a Routine, Task, or a Fork, make a simple patch to share with the room
 
 // APP CLOCK for guis
 

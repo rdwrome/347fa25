@@ -119,7 +119,7 @@ var b = [67, 6, 65, 65, 64, 64, 62];
 var prog = Pbind(
 	\octave, 5,
 	\degree, progA ++ progB ++ progB,
-	\dur, Pseq([4, Pseq([2], 14), 4, Pseq([2], 6)])));
+	\dur, Pseq([4, Pseq([2], 14), 4, Pseq([2], 6)]));
 
 var melody = Pbind(
 	\midinote, (Pseq(a) ++ Pseq(b, 2) ++ Pseq(a)) + 12,
