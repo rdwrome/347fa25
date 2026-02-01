@@ -1,41 +1,6 @@
-//adapted from: https://en.wikibooks.org/wiki/Designing_Sound_in_SuperCollider
+//mostly DSC
 //a plug for pd
 // BOOT
-
-(
-/*
-
-RM octaver
-
-inSignal is RingModulated by a sinusoidal tone with half frequency.
-The resulting spectrum is given by all the components of inSignal with
-half freqs.
-This means that the new spectrum is a one 8ve below version of the input signal's one,
-with only odd partials.
-As a consequence, if inSignal is added again, even partials are
-recovered.
-
-See:
-Miller Puckette, The Theory and Technique of Electronic Music, p. 126
-http://crca.ucsd.edu/~msp/techniques/latest/book.pdf
-http://crca.ucsd.edu/~msp/techniques/latest/book-html/node77.html#sect5.ringmod
-
-andreavalle
-
-*/
-
-s = Server.local.waitForBoot({
-	SynthDef.new(\RmOctaver, { var in, out = 0, freq, hasFreq ;
-		in = SoundIn.ar(0) ;
-		# freq, hasFreq = Pitch.kr(in) ;
-		Out.ar(out, SinOsc.ar(freq: freq*0.5)*in+in);
-	}).add ;
-})
-)
-
-
-Synth.new(\RmOctaver) ;
-
 
 // recirculating schroeder reverb with Ndef and DELAYC
 b = Buffer.read(s,thisProcess.nowExecutingPath.dirname++"/windchimes.wav");
@@ -249,7 +214,7 @@ SynthDef(\phonebell, { |gate=1, freq=465, strength=1, decay=3, amp=1|
 // Here we start the phone bells constantly ringing. We put them in a group for convenience
 ~bellgroup = Group.new(s);
 ~bell1 = Synth(\phonebell, [\freq, 650], ~bellgroup);
-~bell2 = Synth(\phonebell, [\freq, 653], ~bellgroup);
+~bell2 = Synth(\phonebell, [\freq, 909], ~bellgroup);
 
 
 // OK, shush for now
@@ -348,6 +313,10 @@ x = {
 	son * 0.2
 }.play;
 )
+
+// HOUSEKEEPING
+- final project proposal due next week!
+- bring a MIDI controller next week!
 
 //fire
 (

@@ -65,9 +65,9 @@ Font.availableFonts;
 
 (
 w = Window.new("GUI Introduction",Rect(200,200,200,70)).front;
-a = [Font.defaultMonoFace, Font.defaultSansFace, Font.defaultSerifFace];
+a = [Font.new("Arial"), Font.new("Baghdad"), Font.defaultSerifFace];
 b = Button.new(w,Rect(10,10,180,50))
-    .states_([["Monospace"],["Sans serif"],["Serif"]])
+    .states_([["Arial"],["Baghdad"],["Serif"]])
     .font_(a[0])
     .action_({|b| b.font = a[b.value]});
 )
@@ -303,6 +303,7 @@ MIDIIn.connectAll;
 // Wanna send MIDI Out? THIS IIS MAC SPECIFIC!
 //Initialize your IAC Driver in AUDIO MIDI SETUP/MIDI STUDIO
 
+MIDIClient.init;
 MIDIOut.newByName("IAC Driver", "Bus 1");
 
 m = MIDIOut(0);

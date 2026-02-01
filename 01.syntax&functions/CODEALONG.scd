@@ -24,293 +24,120 @@ REMINDERS FROM last week's README.md
 - "Syntax Sugar": many ways to write out the same thing
 - Help! with **Command|D**
 */
-# sclang quick reference
 
-sclang is not a hard language to pick up if you're familiar with the likes of JavaScript, Python,
-Ruby, or Lua. Its object model and syntax are derived from Smalltalk.
+// objects and messages
+// We can assign objects to variables, and then send messages to those objects with the syntax `object.message.` messages will be received (and sent) based on an object's methods
 
-We're just going to breeze through sclang basics here. This isn't meant as a complete language spec,
-but just enough information so you can get on comfortable footing for writing programs in SC.
+~breakfast = { "eggs".scramble };
+~breakfast.value;
 
-Since I'm showing you around a whole gaddang programming language in this chapter, it's going to get
-very long and very dull. As such, this probably isn't the most exciting place to start — the
-beginner's guide is much better if you haven't yet written a line of code. But once you start
-writing more complex programs and need a quick reference on how to do basic programming tasks, this
-is the chapter for you.
+// use a tilda to assign objects to variables on the server
+~rachel={"SuperCollider loves Massimo".postln};
+~rachel.value; // .value is another
 
-## sclang: what's so special about it?
+//parentheses are everything and there is no PEMDAS
+(
+"I love SuperCollider".postln;
+"SuperCollider loves me".postln;
+)
 
-Some programmers come to SuperCollider and are understandably highly skeptical of the idea of
-learning a new programming language, especially one that was designed in the 90's. And I won't mince
-words with you: sclang is far from perfect. It has aged better than some of its contemporaries in
-the computer music sphere, but has some really odd design decisions and long-standing limitations.
-Due to server-client separation, others have written clients for SC in Scala, Python, Lua, Haskell,
-and many other familiar languages. Why should you bother with sclang?
+(100+2/2).postln; // what does this equal?
+(100+(2/2)).postln; // force order of operations using parentheses
 
-First off, sclang is "soft real-time safe." sclang isn't under the constraints of an audio thread
-like scsynth is, but it does need to sequence events with musically accurate rhythm under normal
-conditions, so it is written with features like real-time safe garbage collection. Few interpreted
-languages are designed with this in mind (Lua is a major one).
+// FUNCTIONS
 
-Second, sclang has a feature known as multichannel expansion. These three lines are identical:
+// local variables need to be declared but not by their type (which is good AND bad...)
+// local variables are hella local:
+a = 1;
+(
+var a;
+a = 3;
+);
+a;
 
-    // Naive way:
-    [SinOsc.ar(440), SinOsc.ar(660), SinOsc.ar(880)]
+// a template function definition with both an argument and a local variable
+(
+~banana={ // CURLY BRACKETS WRAP FUNCTIONS
+	| urname = "rachel" | // arguments must be defined first within the function
+	var x; // then variables must be defined next
+	x="bleeePPP BLLLooooopS"; // variables can be assigned later
+	(urname++", do you want to make "++x+"?").postln;
+};
+);
+~banana.value;
+~banana.("rome");
 
-    // "Don't Repeat Yourself" way, like in most programming languages:
-    [440, 660, 880].collect { |freq| SinOsc.ar(freq) };
-
-    // Best way, using multichannel expansion:
-    SinOsc.ar([440, 660, 880])
-
-Most programming languages would at best offer the second syntax. But the third one is true
-idiomatic sclang, and it's more terse and elegant. I know you may be thinking that focusing on
-syntax is shallow, but this makes a *huge* difference when actually working on sound synthesis in
-your artistic practice.
-
-I'm not claiming that multichannel expansion as implemented in sclang has been executed perfectly,
-but it's still tremendously convenient a lot of the time. Being able to duplicate any part of a
-sound synthesis graph easily give sclang an advantage over many other programming languages and
-graphical dataflow languages.
-
-Finally, if you are a SuperCollider user, you should be aware that sclang is the #1 SuperCollider
-client. By only learning an alternate client, you are distancing yourself from the SC community and
-limiting your ability to receive or give help. Most SC users are sclang users, and that's a very
-important network effect if you're new to the platform.
-
-Don't get me wrong ­— I'm not here to condemn alternate clients and the hard work that goes into
-them. I'm sure you'll like some of them better than sclang. But especially for people new to SC,
-sclang is strongly recommended.
-
-## Running code in sclang
-
-For beginning users who come to SC from other languages, the standard method of running code in SC
-from the IDE can be pretty weird and offputting. As a refresher, you write SuperCollider code in
-`.scd` files, which have a bunch of code blocks hanging out in space. Rather than running the whole
-thing at once, individual lines are run using Shift+Enter, and blocks of code delimited by
-parentheses are run using Ctrl+Enter (Cmd+Enter on macOS).
-
-Weird? Yes. But it's less weird once you realize that the **IDE is a glorified REPL**. The workflow
-will be familiar if you've ever used Jupyter or an interactive interpreter like Python's. It's just
-that REPL is the most common way of interacting with SuperCollider.
-
-It's actually possible — and may be preferable — to run sclang like an ordinary program from the
-command line. This can be done by running
-
-    sclang my_file.scd
-
-and it will work fine. The IDE equivalent is to fire up the interpreter, open up `my_file.scd`, and
-select "Language → Evaluate File."
-
-Your file needs to be set up in a special way, however. The parentheses used to delimit code blocks
-for interactive execution will not work as expected, and will usually cause syntax errors. The file
-should be a single parenthetical block, although without the enclosing parentheses. By default,
-sclang does not exit at the end of file evaluation, so you need to manually run, e.g., `0.exit` to
-quit with return code 0. [TODO: provide an actual example!]
-
-Why use REPL in the IDE if sclang can mostly be run as a normal programming language? Although the
-workflow is unusual compared to programming environments, it's not without precedent when viewed as
-artistic audio software. In your average modular synth software or hardware, the "work interface"
-and the "performance interface" are the same. Same for SC: you write your code and you run your code
-in the same place. [TODO: clarify]
-
-One obvious reason to use the IDE is if you incorporate live coding into your work — it's a fully
-capable live coding interface, and can even be augmented with custom behavior specifically for that
-practice. But even if you don't, the IDE provides several user interface benefits, such as showing
-you a CPU meter for the server (very important to ensure code is suitable for live performance) and
-giving you an easy interface for volume control and recording to disk.
-
-If the whole REPL thing is weird for you, I understand, but I assure you that you will get used to
-it. It's all part of SC being live performance software.
-
-## Comments
-
-```supercollider
-// two slashes,
-
-/*
-or multiline style.
+// arguments can be passed into functions when the function has already been passed to the server
+/* can be called two ways:
+arg ;//old-school "pirate" notation
+| | //"pipe notation"
 */
 
-/* Multiline comments /* DO */ nest. */
-```
 
-## Blocks & variables
+/* VERY IMPORTANT DISTINCTION: function arguments you can change on the fly, function variables can be assigned later but you have to reup the synth to the server. Again, in other words: function arguments can be passed to directly to server, but function variables have to be passed from the client to the server with the whole function.
 
-When you execute code in between parentheses, execute code from a single line,
-or execute an entire file, that's a block. The final expression in a block is
-its return value. When you execute a block in the IDE, the post window prints
-out the block's return value, preceded by a `->`.
+// server methods
+- 's' stands for server! Don't assign things to it
+- useful **s.** commands*/
+ s.makeWindow;
+ s.meter;
+ s.record;
+ s.stopRecording;
+ s.scope; // time domain!!!
+ s.freqscope; // frequency domain!!!
 
-```supercollider
+/* UGens
+- Modular building blocks of SuperCollider Systems for synthesis; sound design; algorithmic composition
+- In SC they're actually written in C/C++ and are a plugin to the SC Audio Server, but most come standard with download
+- Most UGen classes have Audio Rate **.ar** and Control Rate **.kr** signal methods internal to the language
+- AR = sends 44.1k values per second; KR = sends 7,350 values per second (1/6th as many as ar. Just saves CPU this way!...like difference between VCO and LFO modules in an analog modular synthesizer).
+- LOOK UP THE arguments OF UGens with <<Command|D>> ALL THE TIME
+- SinOsc is the "hello, world" of computer music.
+- Look at Mul and Add methods of SinOsc in its help file
+https://doc.sccode.org/Guides/Tour_of_UGens.html
+- your early SC use will be weaving parameters of UGens together; using OOP to swap related methods
+*/
+
 (
-1;
-2;
-3;
+~orange={
+	//arg pitch=166; /* PIRATE vs PIPE NOTATION a la rachelle */
+	| pitch=220 |
+	SinOsc.ar(pitch);
+}.play; // .play will play it
 )
-// -> 3
-```
+~orange.set(\pitch,550);
+~orange.set(\pitch,54.midicps); // .midicps converts midi note to frequency (cycles per second)
+~orange.free; // we can stop the play functions with this line
 
-You can declare local variables using `var`. They're lexically scoped, so they
-behave similarly to a lot of your favorite languages.
+/*Stopping sounds with sophistication*
+.free - kills bus assigned to variable on the server (ideal)
+<<Command|.>> - kills all busses on the server (panic)
+Server>Kill All Servers > KILLS ALL SERVERS (apocalypse)
 
-```supercollider
+Let's get out of mono with Pan2:*/
 (
-var foo = 3, bar;
-var baz = 50, quux = foo + baz;
-quux;
+~kiwi={
+	| pitch=220, pan=1 | // N.B. only arguments in this function, no local variables
+	Pan2.ar(SinOsc.ar(pitch), SinOsc.kr(pan)); // .kr vs .ar!
+}.play; // .play will play it
 )
-// -> 53
-```
+~kiwi.set(\pitch,440)
+~kiwi.set(\pan, 1)
+~kiwi.free;
 
-All `var` statements have to go at the top of the block, and can't be
-interspersed with other code. (I know, it sucks.) An unassigned variable is
-given a value of `nil`.
+//Why the pop sound? because the phase is interrupted. We don't have envelopes yet!
 
-A variable name always starts with a *lowercase* Latin letter, then any number
-of characters in `a-z A-Z 0-9 _`. The reserved keywords are quite few:
+/*
+UGens you should know for output, read help files for all!
+Pan2 // Rachel Recommends for Stereo Field
+Out // For sending signals directly to the bus that goes to your hardware Output Device ("master")
+Mix // Great for simple submixing, adding a bunch of channels together
+Splay // Great for complex submixing, spreading a bunch of channels across the Stereo Field
+PanAz // Multi-channel panning gold!
+*/
 
-    var arg classvar const pi true false nil inf
+// sclang my_file.scd
 
-These identifiers are valid variable names, but I wouldn't recommend them,
-because then you won't have access to the actual builtins in the local scope:
-
-    this super thisProcess thisFunction thisFunctionDef thisMethod thisThread
-    currentEnvironment topEnvironment
-
-Assigning to variables outside of `var` statements is done in the regular C way, like `foo = 3;`.
-Assignments return the assigned value, so they may be chained (`foo = bar = 3`). Operators like `+=`
-are *not* supported in the spirit of minimalist Smalltalk syntax.
-
-Variables are scoped to the block they are in, and they cease to exist outside of the block. How do
-we share information between blocks then?
-
-## Environment variables and interpreter globals
-
-sclang doesn't have global variables. Instead, sclang has a syntactic feature known as "environment
-variables" (not to be confused with the OS-level environment variables like `PATH`) that provides a
-substitute for global scope. These are notated with the `~` prefix. In casual conversation, SC users
-often refer to them as "tilde variables."
-
-```supercollider
-~foo = 3;
-~foo // -> 3
-```
-
-These variables persist across blocks. However, what they really supply is *dynamic scoping*. They
-are setting and getting key-value data in a global value called `currentEnvironment`, which can be
-manipulated and changed using various instance and class methods of `Environment`.
-
-Some people like to use exclusively environment variables to get out of typing `var`. I don't
-recommend it. Local variables have garbage collection and are less prone to mistakes (for example, a
-typo'd local variable results in a syntax error, while a typo'd tilde variable returns `nil`). Only
-use environment variables when information needs to be passed between interactively executed blocks.
-
-I lied — sclang does actually have global variables, but it has exactly 26 of them: the letters `a`
-through `z`.
-
-```supercollider
-x = 3;
-x // -> 3
-```
-
-I strongly advise against using these in any production code. They're okay when you're doing
-nonserious tests, but please don't use them in real compositions.
-
-Note that a single-letter variable declared locally (e.g. `var x`) isn't global, and just behaves
-like any other local variable.
-
-## Method calls
-
-In sclang, pretty much every useful operation is performed by doing method calls on objects. The
-object we're calling on is referred to as the *receiver*, and it can take any number of arguments.
-The following are the most common syntaxes for method calls:
-
-```supercollider
-receiver.doSomething(1, 2, 3);
-doSomething(receiver, 1, 2, 3);
-```
-
-The second one looks like a function call, but it's not. `doSomething` is actually a method name,
-and not referring to any variable in the local scope.
-
-Method calls may take keyword arguments:
-
-```supercollider
-receiver.doSomething(foo: 1, bar: 2, baz: 3);
-```
-
-If no arguments are provided, the parentheses may be omitted (as they conventionally are):
-
-```supercollider
-"Hello World".postln();
-"Hello World".postln;
-```
-
-Users coming from JavaScript, Python, or C++ may be used to `.` being for attribute retrieval in
-addition to method calls. In sclang, attribute getters are just method calls.
-
-## Mathematics
-
-I'm sure you can guess what the `nil`, `true`, and `false` keywords are.
-Integers (32-bit signed) and floats (64-bit) are notated in pretty obvious
-ways:
-
-```supercollider
-0 -1 1443 0x07 3.0 4.0 1e8 1e-5
-```
-
-If a decimal point is provided, there must be at least one digit on each side.
-Expressions like `.5` and `3.` are syntax errors. This avoids some ambiguous
-parses.
-
-Your favorite arithmetic operators work as expected. But unlike many other
-languages, **infix operator precedence is always left to right**. The order of
-operations is not respected. These are identical:
-
-```supercollider
-3 + 5 * 4
-(3 + 5) * 4
-```
-
-You're probably groaning right now, but it's internally consistent and not unheard of in language
-design. One good reason for it is that sclang supports operator overloading, allowing you to define
-your own arbitrary operators like `@|@<>@|@`. How would we define the order of operations for those?
-
-I expect you'll find these operators useful (they are syntactic sugar for method calls):
-
-```supercollider
-+ - / * ** == != < > <= >=
-```
-
-`/` always graduates to a float even if both of its arguments are integers. Same for the
-exponentiation operator `**`.
-
-**There is no unary `-`**. When you write `-1`, it's actually a single token. To do unary negation
-on variables and other things that aren't numeric literals, use the `neg` method.
-
-These are good math functions to have under your belt — you can figure them out
-easy:
-
-```supercollider
-asInteger asFloat floor ceil round abs sgn
-sin cos tan tanh
-```
-
-## Functions
-
-Functions are denoted with curly braces. They are first-class objects. The
-return value is simply the final line, and the function is called using the
-`.value` method:
-
-```supercollider
-var myFunction = {
-    someOtherObject.doSomething;
-    3
-};
-myFunction.value
-// -> 3
-```
 
 `myFunction.value` can be shortened to `myFunction.()`, but not `myFunction()`.
 
@@ -586,111 +413,3 @@ consulting the docs:
 
 "hello, world".postln;// make sure to always have a ";" after statements
 
-// objects and messages
-// We can assign objects to variables, and then send messages to those objects with the syntax `object.message.` messages will be received (and sent) based on an object's methods
-
-~breakfast = { "eggs".scramble };
-~breakfast.value;
-
-// use a tilda to assign objects to global variables on the server
-~massimo={"SuperCollider loves Massimo".postln};
-~massimo.value; // .value is another
-
-//parentheses are everything and there is no PEMDAS
-(
-"I love SuperCollider".postln;
-"SuperCollider loves me".postln;
-)
-
-(100+2/2).postln; // what does this equal?
-(100+(2/2)).postln; // force order of operations using parentheses
-
-// FUNCTIONS
-
-// local variables need to be declared but not by their type (which is good AND bad...)
-// local variables are hella local:
-a = 1;
-(
-var a;
-a = 3;
-);
-a;
-
-// a template function definition with both an argument and a local variable
-(
-~banana={ // CURLY BRACKETS WRAP FUNCTIONS
-	| urname | // arguments must be defined first within the function
-	var x; // then variables must be defined next
-	x="bleeePPP BLLLooooopS"; // variables can be assigned later
-	(urname++", do you want to make "++x++"?").postln;
-};
-);
-~banana.("rooommmmee");
-
-// arguments can be passed into functions when the function has already been passed to the server
-/* can be called two ways:
-arg ;//old-school "pirate" notation
-| | //"pipe notation"
-*/
-
-
-/* VERY IMPORTANT DISTINCTION: function arguments you can change on the fly, function variables can be assigned later but you have to reup the synth to the server. Again, in other words: function arguments can be passed to directly to server, but function variables have to be passed from the client to the server with the whole function.
-
-// server methods
-- 's' stands for server! Don't assign things to it
-- useful **s.** commands*/
- s.makeWindow;
- s.meter;
- s.record;
- s.stopRecording;
- s.scope; // time domain!!!
- s.freqscope; // frequency domain!!!
-
-/* UGens
-- Modular building blocks of SuperCollider Systems for synthesis; sound design; algorithmic composition
-- In SC they're actually written in C/C++ and are a plugin to the SC Audio Server, but most come standard with download
-- Most UGen classes have Audio Rate **.ar** and Control Rate **.kr** signal methods internal to the language
-- AR = sends 44.1k values per second; KR = sends 7,350 values per second (1/6th as many as ar. Just saves CPU this way!...like difference between VCO and LFO modules in an analog modular synthesizer).
-- LOOK UP THE arguments OF UGens with <<Command|D>> ALL THE TIME
-- SinOsc is the "hello, world" of computer music.
-- Look at Mul and Add methods of SinOsc in its help file
-https://doc.sccode.org/Guides/Tour_of_UGens.html
-*/
-
-(
-~orange={
-	//arg pitch=166; /* PIRATE vs PIPE NOTATION a la rachelle */
-	| pitch=220 |
-	SinOsc.ar(pitch);
-}.play; // .play will play it
-)
-~orange.set(\pitch,455);
-~orange.set(\pitch,51.midicps); // .midicps converts midi note to frequency (cycles per second)
-~orange.free; // we can stop the play functions with this line
-
-/*Stopping sounds with sophistication*
-.free - kills bus assigned to variable on the server (ideal)
-<<Command|.>> - kills all busses on the server (panic)
-Server>Kill All Servers > KILLS ALL SERVERS (apocalypse)
-
-Let's get out of mono with Pan2:*/
-(
-~kiwi={
-	| pitch=220, pan=1 | // N.B. only arguments in this function, no local variables
-	Pan2.ar(SinOsc.ar(pitch), SinOsc.kr(pan)); // .kr vs .ar!
-}.play; // .play will play it
-)
-~kiwi.set(\pitch,440)
-~kiwi.set(\pan, 4)
-~kiwi.free;
-
-//Why the pop sound? because the phase is interrupted. We don't have envelopes yet!
-
-/*
-UGens you should know for output, read help files for all!
-Pan2 // Rachel Recommends for Stereo Field
-Out // For sending signals directly to the bus that goes to your hardware Output Device ("master")
-Mix // Great for simple submixing, adding a bunch of channels together
-Splay // Great for complex submixing, spreading a bunch of channels across the Stereo Field
-PanAz // Multi-channel panning gold!
-*/

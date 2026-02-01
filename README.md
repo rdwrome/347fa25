@@ -11,17 +11,11 @@ LMSC-261 & MTEC-111 are prerequisites.
 
 #### playback & effects (september 26)
 
-#### NO CLASS october 3
-
 #### analysis how-to and 140 due (october 10)
 
 #### patterns (october 17)
-- Busses, Nodes, Groups
 
 #### scheduling & sequencing (october 24)
-- Scheduling and sequencing
-- Events, Routines, Tasks, Patterns
-- NDef
 
 #### analysis presentations(october 31)
 
@@ -35,16 +29,22 @@ LMSC-261 & MTEC-111 are prerequisites.
 #### (dec 5)
 - final project presentations
 
-#### OPTIONAL CONCERT TBD WEEK OF FINALS
+#### OPTIONAL CONCERT DECEMBER 10 (CALL AT 8PM)
 
 ### Everyday Tools
 * [SuperCollider](https://supercollider.github.io/)
 
-* [Pulsar](https://pulsar-edit.dev/) or editor of your choice...
+* Text Editor of your choice to write MarkDown files
 
-* [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+* Wired Headphones
 
-* Git + GitHub.com + GitHubDesktop
+### Code Lifted From (listed from most used to least used)...
+- SC Documentation Files [SCDF]
+- [Zach Scholl's GitHub [ZS]](https://github.com/schollz)
+- [SuperCollider GitHub "Learn" Tutorial [SCGL]](https://github.com/supercollider/learn)
+- [David Michael Cottle's Book [DMC]](https://rhoadley.net/courses/tech_resources/supercollider/tutorials/cottle/CMSC7105.pdf)
+- [The Designing Sound in SuperCollider Book [DS]](https://en.wikibooks.org/wiki/Designing_Sound_in_SuperCollider)
+- [Eli Fieldsteel's Book EF](https://global.oup.com/academic/product/supercollider-for-the-creative-musician-9780197616994?cc=us&lang=en&)
 
 ## Assignments and Grading
 Description|Grade
@@ -55,10 +55,6 @@ Code Analysis Presentation|25%
 Sharing is Caring Project|25%
 **Total**|**100%**
 ### ALL DUE DATES ARE IN CANVAS
-### Steps to submit assignments via GitHub+Canvas
-  1. Make a subfolder in *your* GitHub repository (not the repository *I* have for the whole class!) named after the assignment (i.e. {yourusername}/{course}/{assignment}, etc.)
-  2. Commit all parts of your assignment (i.e. code+documentation file) into that subfolder
-  3. Submit the link **to that folder** in the appropriate Canvas assignment by the deadline
 
 ### Documentation File outline
   - The documentation file (**always** in Markdown, saved as a .md file) must have the following:
